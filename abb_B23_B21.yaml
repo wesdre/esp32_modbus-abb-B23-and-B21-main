@@ -1,0 +1,468 @@
+substitutions:
+  device: abb_b23_b21
+  device_description: "Esphome component for ABB kWh meter B23 and B21"
+  friendly_name: ABB B23
+
+esphome:
+  name: b23_b21
+#  friendly_name: ${friendly_name}
+  comment: ABB power meter B23 and B21
+  ## Get rid of CDC error:
+  platformio_options:
+    board_build.extra_flags:
+      - "-DARDUINO_USB_CDC_ON_BOOT=0"
+
+## lilygo T7-S3  ESP32S3:
+esp32:
+  board: adafruit_feather_esp32s3_nopsram
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  logs:
+    modbus_controller.sensor: INFO  #set all to DEBUG for higher log level
+    modbus_controller.output: INFO
+    modbus.number: INFO
+    esp32.preferences: INFO
+    sensor: INFO
+    text_sensor: INFO
+    number: INFO
+
+# Enable Home Assistant API
+api:
+  reboot_timeout: 0s
+
+ota:
+#  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendly_name} Hotspot"
+    password: "configesp"
+
+captive_portal:
+    
+web_server:
+  port: 80
+
+### modbus ###  
+uart:
+  id: mod_bus
+  tx_pin: 16
+  rx_pin: 12 
+  baud_rate: 9600
+  stop_bits: 1
+  
+modbus:
+  id: modbus1
+
+modbus_controller:
+  - id: B23
+    address: 0x1
+    modbus_id: modbus1
+    setup_priority: -10
+    update_interval: 10s
+
+  - id: B21
+    address: 0x2
+    modbus_id: modbus1
+    setup_priority: -10
+    update_interval: 10s    
+
+sensor:
+## 1 Total Energy (kWh) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Import energy total"
+    address: 0x5000
+    register_type: holding
+    value_type: U_QWORD
+    device_class: "energy"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Export energy total"
+    address: 0x5004
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+
+## 2 Total energy per phase
+## Active import energy (kWh) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Import energy L1"
+    address: 0x5460
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Import energy L2"
+    address: 0x5464
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Import energy L3"
+    address: 0x5468
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+
+## Active export energy (kWh) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Export energy L1"
+    address: 0x546C
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Export energy L2"
+    address: 0x5470
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Export energy L3"
+    address: 0x5474
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+
+## 3 Instantaneous values
+## 3.1 Voltage (V) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Voltage L1-N"
+    address: 0x5B00
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    device_class: voltage
+    unit_of_measurement: "V"
+    filters:
+      - multiply: 0.1
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Voltage L2-N"
+    address: 0x5B02
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    device_class: voltage
+    unit_of_measurement: "V"
+    filters:
+      - multiply: 0.1
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Voltage L3-N"
+    address: 0x5B04
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    device_class: voltage
+    unit_of_measurement: "V"
+    filters:
+      - multiply: 0.1
+
+## 3.2 Current (A) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Current L1"
+    address: 0x5B0C
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 2
+    device_class: current
+    unit_of_measurement: "A"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Current L2"
+    address: 0x5B0E
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 2
+    device_class: current
+    unit_of_measurement: "A"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Current L3"
+    address: 0x5B10
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 2
+    device_class: current
+    unit_of_measurement: "A"
+    filters:
+      - multiply: 0.01
+
+## 3.3 Active Power (Watt) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Power total"
+    address: 0x5B14
+    register_type: holding
+    value_type: S_DWORD
+    accuracy_decimals: 2
+    device_class: power
+    unit_of_measurement: "W"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Power L1"
+    address: 0x5B16
+    register_type: holding
+    value_type: S_DWORD
+    accuracy_decimals: 2
+    device_class: power
+    unit_of_measurement: "W"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Power L2"
+    address: 0x5B18
+    register_type: holding
+    value_type: S_DWORD
+    accuracy_decimals: 2
+    device_class: power
+    unit_of_measurement: "W"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Power L3"
+    address: 0x5B1A
+    register_type: holding
+    value_type: S_DWORD
+    accuracy_decimals: 2
+    device_class: power
+    unit_of_measurement: "W"
+    filters:
+      - multiply: 0.01
+
+## 3.4 Frequency (Hz) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Frequency"
+    address: 0x5B2C
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 2
+    device_class: frequency
+    unit_of_measurement: "Hz"
+    filters:
+      - multiply: 0.01
+
+## 3.5 Power factor (-) B23
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Power factor total"
+    address: 0x5B3A
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 3
+    device_class: power_factor
+    filters:
+      - multiply: 0.001
+
+########################################################################################################################
+#Next SLAVE B21##
+## 1 Total Energy (kWh) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Import energy"
+    address: 0x5000
+    register_type: holding
+    value_type: U_QWORD
+    device_class: "energy"
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Export energy"
+    address: 0x5004
+    register_type: holding
+    value_type: U_QWORD
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 2
+    state_class: "total_increasing"
+    filters:
+      - multiply: 0.01
+
+## 3 Instantaneous values
+## 3.1 Voltage (V) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Voltage L1-N"
+    address: 0x5B00
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    device_class: voltage
+    unit_of_measurement: "V"
+    filters:
+      - multiply: 0.1
+
+## 3.2 Current (A) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Current L1"
+    address: 0x5B0C
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 2
+    device_class: current
+    unit_of_measurement: "A"
+    filters:
+      - multiply: 0.01
+
+## 3.3 Active Power (Watt) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Power total"
+    address: 0x5B14
+    register_type: holding
+    value_type: S_DWORD
+    accuracy_decimals: 2
+    device_class: power
+    unit_of_measurement: "W"
+    filters:
+      - multiply: 0.01
+
+## 3.4 Frequency (Hz) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Frequency"
+    address: 0x5B2C
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 2
+    device_class: frequency
+    unit_of_measurement: "Hz"
+    filters:
+      - multiply: 0.01
+## 3.5 Power factor (-) B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Power factor total"
+    address: 0x5B3A
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 3
+    device_class: power_factor
+    filters:
+      - multiply: 0.001
+
+## 4 Production data and identification B23
+text_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Serial Number"
+    address: 0x8900
+    register_type: holding
+    response_size: 6
+    entity_category: diagnostic
+    raw_encode: HEXBYTES
+    skip_updates: 60
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Meter firmware version"
+    address: 0x8908
+    register_type: holding
+    response_size: 16
+    entity_category: diagnostic
+    skip_updates: 60
+  - platform: modbus_controller
+    modbus_controller_id: B23
+    name: "B23 Type designation"
+    address: 0x8960
+    register_type: holding
+    response_size: 8
+    entity_category: diagnostic
+    skip_updates: 60
+
+## 4 Production data and identification B21
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Serial Number"
+    address: 0x8900
+    register_type: holding
+    response_size: 6
+    entity_category: diagnostic
+    raw_encode: HEXBYTES
+    skip_updates: 60
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Meter firmware version"
+    address: 0x8908
+    register_type: holding
+    response_size: 16
+    entity_category: diagnostic
+    skip_updates: 60
+  - platform: modbus_controller
+    modbus_controller_id: B21
+    name: "B21 Type designation"
+    address: 0x8960
+    register_type: holding
+    response_size: 8
+    entity_category: diagnostic
+    skip_updates: 60
