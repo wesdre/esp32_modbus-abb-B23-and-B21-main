@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="900" height="320" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14">
+  <rect width="900" height="320" fill="#ffffff"/>
+
+  <!-- ESP -->
+  <rect x="20" y="80" width="180" height="150" rx="10" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="110" y="110" text-anchor="middle" font-weight="bold">Lilygo T7-S3</text>
+  <text x="110" y="132" text-anchor="middle" fill="#555">ESP32-S3</text>
+  <text x="110" y="170" text-anchor="middle">GPIO16 → TX</text>
+  <text x="110" y="192" text-anchor="middle">GPIO12 ← RX</text>
+
+  <!-- converter -->
+  <rect x="250" y="80" width="170" height="150" rx="10" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="335" y="110" text-anchor="middle" font-weight="bold">TTL ↔ RS485</text>
+  <text x="335" y="132" text-anchor="middle" fill="#555">converter</text>
+  <text x="405" y="168" text-anchor="end">A</text>
+  <text x="405" y="193" text-anchor="end">B</text>
+  <text x="405" y="218" text-anchor="end">GND</text>
+  <line x1="200" y1="181" x2="250" y2="181" stroke="#333" stroke-width="2"/>
+  <text x="225" y="173" text-anchor="middle" fill="#555" font-size="12">UART</text>
+
+  <!-- B23 -->
+  <rect x="510" y="80" width="150" height="150" rx="10" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="585" y="110" text-anchor="middle" font-weight="bold">ABB B23</text>
+  <text x="585" y="132" text-anchor="middle" fill="#555">address 1</text>
+  <text x="522" y="168">A</text>
+  <text x="522" y="193">B</text>
+
+  <!-- B21 -->
+  <rect x="720" y="80" width="150" height="150" rx="10" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="795" y="110" text-anchor="middle" font-weight="bold">ABB B21</text>
+  <text x="795" y="132" text-anchor="middle" fill="#555">address 2</text>
+  <text x="732" y="168">A</text>
+  <text x="732" y="193">B</text>
+
+  <!-- bus -->
+  <line x1="420" y1="163" x2="510" y2="163" stroke="#2e7d32" stroke-width="3"/>
+  <line x1="420" y1="188" x2="510" y2="188" stroke="#1565c0" stroke-width="3"/>
+  <line x1="660" y1="163" x2="720" y2="163" stroke="#2e7d32" stroke-width="3"/>
+  <line x1="660" y1="188" x2="720" y2="188" stroke="#1565c0" stroke-width="3"/>
+  <line x1="420" y1="213" x2="470" y2="213" stroke="#333" stroke-width="3" stroke-dasharray="6 4"/>
+  <text x="476" y="217" fill="#555" font-size="12">shield / GND</text>
+
+  <text x="450" y="280" text-anchor="middle" fill="#555" font-size="13">Modbus RTU · 9600 8N1 · daisy-chain A/B with twisted pair · 120 Ω termination at the bus ends on long runs</text>
+</svg>

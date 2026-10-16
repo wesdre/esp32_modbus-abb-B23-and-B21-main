@@ -1,27 +1,29 @@
-# ESP32 modbus ABB- B23 and B21
-Reading the ABB kWh meter with ESP32 over modbus, publising to Home Assistant
+# ESP32 Modbus ABB B23 and B21
 
-## Hardware
-- ESP32 board [lilygo T7-S3  ESP32S3](https://www.lilygo.cc/products/t7-s3)
-- TTL to RS485 converter [MAX485](https://www.analog.com/en/products/max485.html)
-- kWh meter [B23 112-100](https://new.abb.com/products/2CMA100164R1000/b23-112-100)
-- kWh meter [B21 111-100](https://new.abb.com/products/2CMA100149R1000/b21-111-100)
+Reading the **ABB B23** (3-phase) and **ABB B21** (1-phase) kWh meters with an
+ESP32 over RS485 / Modbus RTU and publishing them to Home Assistant with
+ESPHome.
 
+| Folder | Contents |
+|---|---|
+| [`esphome/`](esphome/) | ESPHome configuration, wiring and a Home Assistant screenshot |
+| [`documents/`](documents/) | [Modbus registers used for the B23 and B21](documents/ABB-B23-B21-modbus-registers.md) |
 
-## Software / Documentation
-- [Home Assistant](https://www.home-assistant.io/) Home automation software
-- [ESPHome](https://esphome.io/) to program the ESP32 (Home Assistant plugin)
-- [ABB Modbus documentation (see specific manual][(https://new.abb.com/products/2CMA100149R1000/b21-111-100)
+## In short
 
-ESPHome config file: [abb_B23_B21.yaml](abb_B23_B21.yaml)
+- Both meters on one RS485 bus, B23 at address 1 and B21 at address 2
+- Modbus RTU, 9600 8N1, function code 03
+- Energy (import/export, per phase), voltage, current, power, frequency and
+  power factor
+- Uses ESPHome's standard `modbus_controller`
 
+## Thanks to
 
+- [systeembeheerder](https://github.com/systeembeheerder) – source of
+  inspiration and the ABB related code
+- [fonske (AKA AUijtdehaag)](https://github.com/fonske) – the hardware and
+  related code
 
-Screenshot from Home Assistant:
+## License
 
-![ABB B23_B21  HA](https://github.com/wesdre/esp32_modbus-abb-B23-and-B21/assets/5335971/18e6a514-d70f-4fc5-9440-c2ab6f56183c)
-
-# Thanks to:
-
-systeembeheerder (https://github.com/systeembeheerder) being the sources of inspiration and ABB related code.
-fonske (AKA AUijtdehaag) (https://github.com/fonske) For the HW and related code.
+[GPL-3.0](LICENSE)

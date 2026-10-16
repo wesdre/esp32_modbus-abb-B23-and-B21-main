@@ -1,11 +1,26 @@
+# ============================================================================
+# ESPHome – ABB B23 (3-phase) and B21 (1-phase) kWh meters over RS485 / Modbus
+# ============================================================================
+# Both meters share one RS485 bus. Each meter needs its own Modbus address,
+# set in the meter menu (here B23 = 1, B21 = 2), and the same serial settings
+# as below.
+#
+# Register map: ../documents/ABB-B23-B21-modbus-registers.md
+# ============================================================================
+
 substitutions:
-  device: abb_b23_b21
-  device_description: "Esphome component for ABB kWh meter B23 and B21"
-  friendly_name: ABB B23
+  device_name: b23-b21
+  friendly_name: ABB B23 B21
+  board_type: adafruit_feather_esp32s3_nopsram   # Lilygo T7-S3 (ESP32-S3)
+  uart_tx_pin: "16"
+  uart_rx_pin: "12"
+  uart_baud: "9600"
+  b23_address: "0x1"
+  b21_address: "0x2"
+  update_interval: 10s
 
 esphome:
-  name: b23_b21
-#  friendly_name: ${friendly_name}
+  name: ${device_name}
   comment: ABB power meter B23 and B21
   ## Get rid of CDC error:
   platformio_options:
@@ -14,7 +29,7 @@ esphome:
 
 ## lilygo T7-S3  ESP32S3:
 esp32:
-  board: adafruit_feather_esp32s3_nopsram
+  board: ${board_type}
   framework:
     type: arduino
 
@@ -32,47 +47,47 @@ logger:
 # Enable Home Assistant API
 api:
   reboot_timeout: 0s
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
-#  password: !secret ota_password
+  - platform: esphome
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-
-# Enable fallback hotspot (captive portal) in case wifi connection fails
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "${friendly_name} Hotspot"
-    password: "configesp"
 
 captive_portal:
-    
+
 web_server:
   port: 80
 
-### modbus ###  
+### modbus ###
 uart:
   id: mod_bus
-  tx_pin: 16
-  rx_pin: 12 
-  baud_rate: 9600
+  tx_pin: ${uart_tx_pin}
+  rx_pin: ${uart_rx_pin}
+  baud_rate: ${uart_baud}
   stop_bits: 1
-  
+
 modbus:
   id: modbus1
 
 modbus_controller:
   - id: B23
-    address: 0x1
+    address: ${b23_address}
     modbus_id: modbus1
     setup_priority: -10
-    update_interval: 10s
+    update_interval: ${update_interval}
 
   - id: B21
-    address: 0x2
+    address: ${b21_address}
     modbus_id: modbus1
     setup_priority: -10
-    update_interval: 10s    
+    update_interval: ${update_interval}
 
 sensor:
 ## 1 Total Energy (kWh) B23
